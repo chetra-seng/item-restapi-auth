@@ -6,6 +6,8 @@ from dotenv import load_dotenv
 
 from db import db
 from ma import ma
+from ao import oauth
+from resources.github import GithubLogin, GithubAuthorized, SetPassword
 from resources.user import UserRegister, UserLogin, User
 
 
@@ -30,8 +32,12 @@ def handle_marshmallow_validation(err):
 api.add_resource(UserRegister, "/register")
 api.add_resource(User, "/user/<int:user_id>")
 api.add_resource(UserLogin, "/login")
+api.add_resource(GithubLogin, '/login/github')
+api.add_resource(GithubAuthorized, '/login/github/authorized')
+api.add_resource(SetPassword, '/password')
 
 if __name__ == "__main__":
     db.init_app(app)
     ma.init_app(app)
+    oauth.init_app(app)
     app.run(port=5000)

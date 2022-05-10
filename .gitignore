@@ -129,6 +129,5 @@ dmypy.json
 .pyre/
 
 # File to ignores
-*/.idea/
 data.db
 */.DS_Store
