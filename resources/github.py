@@ -3,7 +3,11 @@ from flask_restful import Resource
 from flask_jwt_extended import create_access_token, create_refresh_token, jwt_required
 
 from ao import github
+from libs.strings import gettext
 from models.user import UserModel
+from schemas.user import UserSchema
+
+user_schema = UserSchema()
 
 
 class GithubLogin(Resource):
@@ -45,7 +49,17 @@ class GithubAuthorized(Resource):
 
 class SetPassword(Resource):
     @classmethod
+    @jwt_required(fresh=True)
     def put(cls):
-        user_data = request.get_data()
+        user_json = request.get_json()
+        user_data = user_schema.load(user_json)
 
-        return user_data
+        user = UserModel.find_by_username(user_data.username)
+
+        if not user:
+            return {"message": gettext("user_not_found")}, 400
+
+        user.password = user_data.password
+        user.save_to_db()
+
+        return {"message": gettext("user_password_updated")}, 201
